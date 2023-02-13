@@ -11,20 +11,23 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
 
-public class ServerApp 
-{
-    public static void main( String[] args ) throws IOException {
-        
+public final class ServerApp {
+    private ServerApp() {
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        // need the random class to carry out randomize operation
         Random random = new Random();
 
-        // generate random number between 0 to 99
+        // generate random number between 0 and 99
         Integer randomNumber = random.nextInt(100);
 
         // store my guess
         Integer myGuess = 0;
-
+        
         // open the socket server to listen on port 1234 for input
-        System.out.println("Server running on port 1234");
+        System.out.println("Server running on port 1234...");
         ServerSocket ss = new ServerSocket(1234);
         Socket s = ss.accept();
 
@@ -33,31 +36,34 @@ public class ServerApp
         BufferedInputStream bis = new BufferedInputStream(is);
         DataInputStream dis = new DataInputStream(bis);
 
-        // preparing sending data out through socket to client (sending out)
+        // prepare sending data out using socket to client (sending out)
         OutputStream os = s.getOutputStream();
         BufferedOutputStream bos = new BufferedOutputStream(os);
         DataOutputStream dos = new DataOutputStream(bos);
 
-        String msgReceived = "";
+        String msgRecv = "";
 
-        while (!msgReceived.equals("quit")) {
-            // guess XX 
-            msgReceived = dis.readUTF();
+        while (!msgRecv.equals("quit")) {
+            // guess XX
+            msgRecv = dis.readUTF();
 
-            if (msgReceived.contains("guess")) {
-                myGuess = Integer.parseInt(msgReceived.substring(6));
+            if (msgRecv.contains("guess")) {
+                myGuess = Integer.parseInt(msgRecv.substring(6));
             }
+
 
             if (myGuess < randomNumber) {
                 dos.writeUTF("Your guessed number is lower.");
             } else if (myGuess > randomNumber) {
-                dos.writeUTF("Your guessed number is higher.");
+                dos.writeUTF("Your guessed number is higher");
             } else {
-                dos.writeUTF("You have finally guessed it right!");
+                dos.writeUTF("you have finally guessed it right!");
             }
-            // ensure records are written and sent across the socket
+
+            // ensure records are written and send across the socket 
             dos.flush();
         }
+
         // close the input and output streams
         dos.close();
         bos.close();
